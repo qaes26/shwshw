@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تتويج أميرة قلبي شادية</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Amiri for Royal look, Cairo for body -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --royal-blue: #0b132b;
+            --deep-navy: #050a1f;
+            --gold-light: #fceea7;
+            --gold-main: #d4af37;
+            --gold-dark: #aa8529;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: radial-gradient(circle at center, var(--royal-blue) 0%, var(--deep-navy) 100%);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+        
+        .royal-font {
+            font-family: 'Amiri', serif;
+        }
+
+        /* Gold Text Gradient */
+        .gold-text {
+            background: linear-gradient(to right, var(--gold-light), var(--gold-main), var(--gold-light));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0px 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Royal Glass Frame */
+        .royal-frame {
+            background: rgba(11, 19, 43, 0.6);
+            backdrop-filter: blur(12px);
+            border: 2px solid var(--gold-dark);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.15), inset 0 0 20px rgba(212, 175, 55, 0.05);
+            position: relative;
+        }
+        
+        /* Inner Gold Border */
+        .royal-frame::before {
+            content: '';
+            position: absolute;
+            top: 10px; left: 10px; right: 10px; bottom: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
+        /* Royal Image Frame */
+        .royal-image-frame {
+            border: 4px solid var(--gold-main);
+            padding: 8px;
+            background: #fff;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 20px rgba(212,175,55,0.4);
+            border-radius: 12px;
+            transition: transform 0.5s ease;
+        }
+        
+        .royal-image-frame:hover {
+            transform: scale(1.03) translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 30px rgba(212,175,55,0.6);
+        }
+
+        /* Animations */
+        @keyframes majesticReveal {
+            0% { opacity: 0; transform: translateY(30px) scale(0.95); filter: blur(10px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        @keyframes goldShimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+
+        @keyframes blinkCursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .shimmer-bg {
+            background: linear-gradient(90deg, var(--gold-dark) 0%, var(--gold-light) 50%, var(--gold-dark) 100%);
+            background-size: 200% auto;
+            animation: goldShimmer 3s linear infinite;
+        }
+
+        /* Screens Visibility */
+        .full-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            transition: opacity 1.5s ease-in-out, visibility 1.5s;
+        }
+
+        #start-screen { background: var(--deep-navy); }
+        #story-screen { 
+            background: radial-gradient(circle at center, #0b132b 0%, #000000 100%); 
+            display: none; 
+            opacity: 0;
+        }
+        
+        .hide-screen {
+            opacity: 0 !important;
+            visibility: hidden;
+        }
+
+        #main-content {
+            display: none;
+            opacity: 0;
+        }
+
+        .show-content {
+            display: flex !important;
+            opacity: 1 !important;
+            animation: majesticReveal 2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .star-particle {
+            position: absolute;
+            background: var(--gold-light);
+            border-radius: 50%;
+            animation: floatSlow 4s infinite ease-in-out;
+        }
+
+        /* Typewriter Cursor */
+        .typing-cursor {
+            display: inline-block;
+            width: 3px;
+            height: 1.2em;
+            background-color: var(--gold-main);
+            vertical-align: middle;
+            margin-right: 4px;
+            animation: blinkCursor 0.8s infinite;
+        }
+        
+        .story-text-container {
+            transition: opacity 1s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Audio Element -->
+    <audio id="celebration-song" loop>
+        <source src="song.3.m4a" type="audio/mp4">
+    </audio>
+
+    <!-- 1. Start Screen (The Royal Seal) -->
+    <div id="start-screen" class="full-screen">
+        <div class="text-center p-8 max-w-md w-[90%] relative">
+            <h1 class="royal-font text-3xl md:text-4xl gold-text mb-8 tracking-wide font-bold">رسالة ملكية خاصة 📜</h1>
+            
+            <button id="start-btn" class="shimmer-bg text-[#050a1f] font-bold py-4 px-12 rounded-full shadow-2xl text-xl w-full transition-all hover:scale-105" style="animation: pulseGlow 2s infinite;">
+                افتحي الرسالة يا أميرتي 👑
+            </button>
+            <p class="text-gray-400 mt-6 text-sm font-light">يُرجى رفع الصوت للاستمتاع بالمفاجأة</p>
+        </div>
+    </div>
+
+    <!-- 2. Story Screen (Typewriter Effect) -->
+    <div id="story-screen" class="full-screen">
+        <div class="story-text-container text-center px-6 max-w-3xl w-full">
+            <h2 id="story-text" class="royal-font text-3xl md:text-5xl gold-text leading-relaxed tracking-wide min-h-[150px]"></h2>
+            <span class="typing-cursor" id="cursor"></span>
+        </div>
+    </div>
+
+    <!-- 3. Main Content (The Royal Hall) -->
+    <div id="main-content" class="container mx-auto px-4 py-12 flex-col items-center justify-center min-h-screen relative">
+        
+        <!-- Background decorative stars -->
+        <div class="star-particle w-1 h-1 top-20 left-20"></div>
+        <div class="star-particle w-2 h-2 top-40 right-32" style="animation-delay: 1s;"></div>
+        <div class="star-particle w-1.5 h-1.5 bottom-32 left-1/4" style="animation-delay: 2s;"></div>
+
+        <div class="royal-frame max-w-4xl w-full rounded-2xl p-8 md:p-14 text-center z-10 mt-8 mb-12">
+            
+            <!-- Royal Crown Icon -->
+            <div class="mb-6 animate-[floatSlow_3s_ease-in-out_infinite]">
+                <svg class="w-16 h-16 mx-auto text-[#d4af37]" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V18H19V19Z"/>
+                </svg>
+            </div>
+
+            <!-- Header -->
+            <h1 class="royal-font text-5xl md:text-6xl font-bold gold-text mb-6">
+                تتويج أميرة قلبي
+            </h1>
+            
+            <h2 class="text-2xl md:text-3xl text-gray-300 mb-10 font-semibold tracking-wide">
+                دمتِ فخراً لي يا <span class="gold-text royal-font text-4xl">شادية</span>
+            </h2>
+
+            <!-- Deep Message -->
+            <div class="relative max-w-3xl mx-auto mb-14">
+                <span class="absolute -top-6 -right-4 text-6xl text-[#d4af37] opacity-20 royal-font">"</span>
+                <p class="text-xl md:text-2xl text-gray-200 leading-relaxed royal-font">
+                    يا خطيبتي وعمري وروحي وحياتي، نجاحكِ هو نجاحي، وفرحتكِ هي عيدي.<br>
+                    فخورٌ جداً بهذا الإنجاز وبمعدلكِ الرائع، أنتِ لستِ فقط في المرتبة الثالثة،<br>
+                    بل أنتِ دائماً وأبداً في المرتبة الأولى في قلبي، وستبقين تاجاً يزين حياتي.
+                </p>
+                <span class="absolute -bottom-10 -left-4 text-6xl text-[#d4af37] opacity-20 royal-font">"</span>
+            </div>
+
+            <!-- Result Image (Added here as requested) -->
+            <div class="relative z-10 mb-12 flex justify-center">
+                <!-- استخدام نفس اسم الصورة المرفق -->
+                <img src="23049_2.jpg" alt="إنجاز وتفوق شادية" class="royal-image-frame w-full max-w-lg object-contain">
+            </div>
+
+            <!-- Custom Audio Controls -->
+            <div class="flex flex-col items-center justify-center gap-3 z-10 relative mt-8">
+                <p class="text-[#d4af37] text-sm tracking-widest font-bold">موسيقى الاحتفال 🎵</p>
+                <button id="toggle-audio" class="w-14 h-14 border-2 border-[#d4af37] rounded-full flex items-center justify-center transition-all hover:bg-[#d4af37] hover:text-[#050a1f] text-[#d4af37]">
+                    <!-- Pause Icon -->
+                    <svg id="pause-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                    <!-- Play Icon (Hidden initially) -->
+                    <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="w-1/2 h-px bg-gradient-to-r from-transparent via-[#d4af37] to-transparent mx-auto my-10 opacity-50"></div>
+
+            <!-- Footer (Personalized for Fiancee) -->
+            <footer class="mt-4 z-10 relative text-center">
+                <p class="royal-font text-2xl text-gray-300">
+                    بكل حُب، وعشق، وفخر، من خطيبك: <br>
+                    <span class="gold-text text-3xl mt-2 block font-bold">قيس جازي</span>
+                </p>
+            </footer>
+            
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const startBtn = document.getElementById('start-btn');
+            const startScreen = document.getElementById('start-screen');
+            const storyScreen = document.getElementById('story-screen');
+            const mainContent = document.getElementById('main-content');
+            const storyTextElement = document.getElementById('story-text');
+            const cursorElement = document.getElementById('cursor');
+            const storyContainer = document.querySelector('.story-text-container');
+            
+            const audio = document.getElementById('celebration-song');
+            const toggleAudioBtn = document.getElementById('toggle-audio');
+            const playIcon = document.getElementById('play-icon');
+            const pauseIcon = document.getElementById('pause-icon');
+
+            // عبارات القصة (تظهر كصفحات متتالية لشادية خطيبتك)
+            const storyPages = [
+                "إلى خطيبتي، وعمري، وروحي، وحياتي... شادية",
+                "طالما كنتُ على يقين بأنكِ استثنائية في كل شيء...",
+                "واليوم، هذا الإنجاز الرائع يثبت للجميع ما أعرفه أنا دائماً.",
+                "يا من تتربعين في المرتبة الأولى في قلبي للأبد...",
+                "فخورٌ بكِ بحجم السماء، وبكل خطوة نجاح تخطينها.",
+                "أميرتي شادية... حان وقت التتويج 👑"
+            ];
+            
+            let currentPage = 0;
+            let isTyping = false;
+
+            // Fire Royal Gold Confetti Function
+            const fireGoldConfetti = () => {
+                var duration = 20 * 1000; // 20 seconds of gold rain
+                var animationEnd = Date.now() + duration;
+                var defaults = { 
+                    startVelocity: 25, 
+                    spread: 360, 
+                    ticks: 100, 
+                    zIndex: 100,
+                    colors: ['#d4af37', '#fceea7', '#aa8529', '#ffffff']
+                };
+
+                function randomInRange(min, max) {
+                    return Math.random() * (max - min) + min;
+                }
+
+                var interval = setInterval(function() {
+                    var timeLeft = animationEnd - Date.now();
+                    if (timeLeft <= 0) return clearInterval(interval);
+                    var particleCount = 40 * (timeLeft / duration);
+                    confetti(Object.assign({}, defaults, { 
+                        particleCount, 
+                        origin: { x: randomInRange(0.1, 0.9), y: Math.random() - 0.2 },
+                        shapes: ['circle', 'square'],
+                        scalar: randomInRange(0.8, 1.2)
+                    }));
+                }, 300);
+            };
+
+            // دالة الكتابة بأسلوب الآلة الكاتبة
+            function typeWriter(text, i, callback) {
+                if (i < text.length) {
+                    storyTextElement.innerHTML += text.charAt(i);
+                    // سرعة الكتابة
+                    setTimeout(() => typeWriter(text, i + 1, callback), 80);
+                } else {
+                    // الانتهاء من كتابة الصفحة الحالية
+                    setTimeout(callback, 2500); // الانتظار 2.5 ثانية قبل الانتقال للصفحة التالية
+                }
+            }
+
+            // تشغيل القصة
+            function playStory() {
+                if (currentPage < storyPages.length) {
+                    storyContainer.style.opacity = 1;
+                    storyTextElement.innerHTML = '';
+                    
+                    typeWriter(storyPages[currentPage], 0, () => {
+                        // إخفاء النص الحالي للانتقال للتالي
+                        storyContainer.style.opacity = 0;
+                        
+                        setTimeout(() => {
+                            currentPage++;
+                            playStory(); // استدعاء الصفحة التالية
+                        }, 1000); // وقت اختفاء النص
+                    });
+                } else {
+                    // انتهاء القصة، إظهار الشاشة النهائية
+                    storyScreen.classList.add('hide-screen');
+                    setTimeout(() => {
+                        storyScreen.style.display = 'none';
+                        mainContent.classList.add('show-content');
+                        setTimeout(fireGoldConfetti, 800);
+                    }, 1000);
+                }
+            }
+
+            // Start Event
+            startBtn.addEventListener('click', () => {
+                // Play Audio
+                audio.volume = 0.8;
+                audio.play().catch(error => console.log("Audio playback failed:", error));
+                
+                // Hide Start Screen smoothly
+                startScreen.classList.add('hide-screen');
+                
+                setTimeout(() => {
+                    startScreen.style.display = 'none';
+                    // Show Story Screen
+                    storyScreen.style.display = 'flex';
+                    setTimeout(() => {
+                        storyScreen.style.opacity = 1;
+                        playStory(); // بدء القصة
+                    }, 100);
+                }, 1200); 
+            });
+
+            // Toggle Audio Play/Pause
+            toggleAudioBtn.addEventListener('click', () => {
+                if (audio.paused) {
+                    audio.play();
+                    playIcon.classList.add('hidden');
+                    pauseIcon.classList.remove('hidden');
+                } else {
+                    audio.pause();
+                    pauseIcon.classList.add('hidden');
+                    playIcon.classList.remove('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
